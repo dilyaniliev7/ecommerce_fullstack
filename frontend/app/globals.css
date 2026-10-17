@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+    --background: #fff;
+    --foreground: #171717;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-primary: var(--font-roboto);
+}
+
+@layer base {
+    body {
+        background: var(--background);
+        color: var(--foreground);
+        font-family: var(--font-primary);
+    }
+
+    hr {
+        @apply w-full border-t border-[#ccc] my-4;
+    }
+}
+
+@layer utilities {
+
+    .custom-btn {
+        @apply w-fit font-normal rounded py-2 px-4 text-center whitespace-nowrap flex justify-center items-center;
+    }
+
+    .custom-input {
+        @apply w-full border border-[#ddd] bg-white/80 px-4 py-2 rounded outline-none;
+    }
+
+    .custom-input:focus {
+        @apply border-[#aaa] ring-0;
+    }
+
+
+    /* Remove spinner arrows from number inputs */
+    .hide-arrows {
+        @apply w-full border border-[#ddd] bg-white/80 px-4 py-2 rounded;
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .hide-arrows::-webkit-inner-spin-button,
+    .hide-arrows::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Ensure buttons have pointer cursor when not disabled */
+    button:not(:disabled) {
+        cursor: pointer;
+    }
+}
+
+@media print {
+    body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .print-content {
+        margin: 0;
+        padding: 0;
+    }
+
+    .print-content .rounded-2xl {
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .print-content .bg-gradient-to-r {
+        background: #1a1a1a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .print-content .bg-gray-50 {
+        background-color: #f9fafb !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .print-content .border {
+        border-color: #e5e7eb !important;
+    }
+
+    /* Override fonts for print */
+    * {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+            sans-serif !important;
+    }
+
+    .print-content h1,
+    .print-content h2,
+    .print-content h3 {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+            sans-serif !important;
+    }
+
+    @page {
+        size: A4;
+        margin: 1.5cm;
+    }
+}
