@@ -15,7 +15,8 @@ class User(AbstractUser):
     avatar = models.FileField(
         upload_to="profile",
         null=True,
-        blank=True
+        blank=True,
+        default="/default-avatar.png"
     )
     username = models.CharField(
         max_length=30,
@@ -35,4 +36,7 @@ class User(AbstractUser):
             base_name = self.email.split("@")[0].strip()
             clean_name = re.sub(r"[^a-ZA-Z]", "-", base_name).strip("-").lower()
             self.full_name = clean_name
+
+        if not self.avatar:
+            self.avatar = "/default-avatar.png"
         return super().save(*args, **kwargs)
