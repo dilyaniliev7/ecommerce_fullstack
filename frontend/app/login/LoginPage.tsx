@@ -1,6 +1,18 @@
+"use client"
 import Link from "next/link"
+import { Login, Register } from "@/lib/auth"
+import { useEffect } from "react"
+
 
 export default function LoginClient() {
+    useEffect(() => {
+        const formData = new FormData()
+        formData.append("username", "dilyaniliev")
+        formData.append("email", "dilyaniliev7@abv.bg")
+        formData.append("password", "includee7")
+        formData.append("password2", "includee7")
+        Register(formData)
+    }, [])
 	return (
 		<div className="w-full  bg-white relative">
 			{/* Background grid */}
