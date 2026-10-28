@@ -1,7 +1,13 @@
+"use client"
+import { setAuthStore } from "@/lib/auth"
 import Link from "next/link"
 import { BsCart2 } from "react-icons/bs"
 
 export default function Navbar() {
+    const {user, isAuthenticated} = useAuthStore()
+    useEffect(() => {
+        setAuthStore()
+    }, [])
 	return (
 		<header className="w-full border-b border-[#ddd] py-1 relative bg-white">
 			<div className="w-full max-w-7xl mx-auto px-4 flex justify-between items-center">
@@ -54,25 +60,25 @@ export default function Navbar() {
 					</ul>
 
 					<div className="profile flex items-center gap-4">
-						{/* Authenticated block */}
-						<div className="flex items-center gap-3">
-							<Link href={"/profile"}>
-								<img src={"/placeholder.jpg"} className="w-10 h-10 rounded-full object-cover border border-[#ddd]" alt="avatar" />
-							</Link>
-							<Link href={"/logout"}>
-								<button className="custom-btn bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-md transition">Logout</button>
-							</Link>
-						</div>
+						{isAuthenticated ?
+                            <div className="flex items-center gap-3">
+                                <Link href={"/profile"}>
+                                    <img src={`${BACKEND_URL}${user?.avatar}`} className="w-10 h-10 rounded-full object-cover border border-[#ddd]" alt="avatar" />
+                                </Link>
+                                <Link href={"/logout"}>
+                                    <button className="custom-btn bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-md transition">Logout</button>
+                                </Link>
+                            </div>
 
-						{/* Non-authenticated block */}
-						<div className="flex items-center gap-3">
-							<Link href={"/login"}>
-								<button className="custom-btn bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-md transition">Login</button>
-							</Link>
-							<Link href={"/register"}>
-								<button className="custom-btn bg-neutral-200 hover:bg-neutral-300 text-black px-4 py-2 rounded-md transition">Register</button>
-							</Link>
-						</div>
+						:
+                            <div className="flex items-center gap-3">
+                                <Link href={"/login"}>
+                                    <button className="custom-btn bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-md transition">Login</button>
+                                </Link>
+                                <Link href={"/register"}>
+                                    <button className="custom-btn bg-neutral-200 hover:bg-neutral-300 text-black px-4 py-2 rounded-md transition">Register</button>
+                                </Link>
+                            </div>}
 					</div>
 
 					{/* Cart icon for desktop */}
@@ -103,25 +109,25 @@ export default function Navbar() {
 					</ul>
 
 					<div className="profile flex flex-col gap-4">
-						{/* Authenticated block */}
-						<div className="flex items-center gap-3">
-							<Link href={"/profile"}>
-								<img src={"/placeholder.jpg"} className="w-10 h-10 rounded-full object-cover border border-[#ddd]" alt="avatar" />
-							</Link>
-							<Link href={"/logout"}>
-								<button className="custom-btn bg-rose-500 hover:bg-rose-600 text-white w-full text-center py-2 rounded-md transition">Logout</button>
-							</Link>
-						</div>
-
+						{isAuthenticated ?
+                            <div className="flex items-center gap-3">
+                                <Link href={"/profile"}>
+                                    <img src={`${BACKEND_URL}${user?.avatar}`} className="w-10 h-10 rounded-full object-cover border border-[#ddd]" alt="avatar" />
+                                </Link>
+                                <Link href={"/logout"}>
+                                    <button className="custom-btn bg-rose-500 hover:bg-rose-600 text-white w-full text-center py-2 rounded-md transition">Logout</button>
+                                </Link>
+                            </div>
+                        :
 						{/* Non-authenticated block */}
-						<div className="flex flex-col gap-3">
-							<Link href={"/login"}>
-								<button className="custom-btn bg-sky-500 hover:bg-sky-600 text-white w-full text-center py-2 rounded-md transition">Login</button>
-							</Link>
-							<Link href={"/register"}>
-								<button className="custom-btn bg-neutral-200 hover:bg-neutral-300 text-black! w-full text-center py-2 rounded-md transition">Register</button>
-							</Link>
-						</div>
+                            <div className="flex flex-col gap-3">
+                                <Link href={"/login"}>
+                                    <button className="custom-btn bg-sky-500 hover:bg-sky-600 text-white w-full text-center py-2 rounded-md transition">Login</button>
+                                </Link>
+                                <Link href={"/register"}>
+                                    <button className="custom-btn bg-neutral-200 hover:bg-neutral-300 text-black! w-full text-center py-2 rounded-md transition">Register</button>
+                                </Link>
+                            </div>}
 					</div>
 				</nav>
 			</div>

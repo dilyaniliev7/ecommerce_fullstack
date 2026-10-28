@@ -5,10 +5,17 @@ import { jwtDecode } from "jwt-decode"
 import { publicApiInstance } from "./apiInstance"
 import {ACCESS_TOKEN_COOKIE_NAME, COOKIE_OPTIONS, REFRESH_TOKEN_COOKIE_NAME} from "./constants"
 
+
 const SaveAuthTokens = (data:{access:string, refresh:string}) => {
-    cookie.set(ACCESS_TOKEN_COOKIE_NAME, data.access, {...COOKIE_OPTIONS, expires:1})
-    cookie.set(REFRESH_TOKEN_COOKIE_NAME, data.refresh, {...COOKIE_OPTIONS, expires:30})
+    Cookie.set(ACCESS_TOKEN_COOKIE_NAME, data.access, {...COOKIE_OPTIONS, expires:1})
+    Cookie.set(REFRESH_TOKEN_COOKIE_NAME, data.refresh, {...COOKIE_OPTIONS, expires:30})
+
+    const {login} = useAuthStore.getState()
+    const {full_name, username, email, avatar} = jwtDecode<UserDataType>(data.access)
+
+    login({full_name, username, email, avatar})
 }
+
 
 export const Login = async (data:{email:string, password:string}) : Promise<{error:any | null}>=> {
     try {
@@ -42,6 +49,8 @@ export const Register = async (data: FormData) : Promise<{error:any | null}>=> {
 export const Logout = () => {
     Cookie.remove(ACCESS_TOKEN_COOKIE_NAME)
     Cookie.remove(REFRESH_TOKEN_COOKIE_NAME)
+    const {logout} = useAuthStore.getState()
+    logout()
 }
 
 let isRefreshing = false
@@ -76,7 +85,7 @@ export const RefreshToken = async(): Promise<{ error: boolean}> =>{
         } else{
             const refresh_token = Cookie.get(REFRESH_TOKEN_COOKIE_NAME)
             isRefreshing = true
-            const res = await publicApiInstance.post("authentication/token/refresh", {
+            const res = await publicApiInstance.post("authentication/token/refresh/", {
                 refresh:refresh_token
             })
             SaveAuthTokens({access:res.data.access, refresh:res.data.refresh})
@@ -102,4 +111,17 @@ export const IsTokenExpired = (token:string|undefined|null) boolean=>{
     } catch (error){
         return true
     }
+}
+
+
+export setAuthStore = async ()=>{
+    const access = Cookie.get(ACCESS_TOKEN_COOKIE_NAME) as string
+    const refresh = Cookie.get(REFRESH_TOKEN_COOKIE_NAME) as string
+    if (isTokenExpired(access)){
+        const res = await RefreshToken()
+        if(res.error) return Logout()
+    }
+
+    SaveAuthTokens({access, refresh})
+
 }
