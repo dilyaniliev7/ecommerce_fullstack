@@ -1,13 +1,31 @@
 "use client"
 import Link from "next/link"
+import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+
 import { Login, Register } from "@/lib/auth"
-import { useEffect } from "react"
+import { redirect } from "next/navigation"
+import { SubmitEventHandler, useEffect, useState } from "react"
 
 
 export default function LoginClient() {
-    useEffect(() => {
-        Login({email:"dilyaniliev7@abv.bg", password:"includee7"})
-    }, [])
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [errors, setErrors] = useState<Record<string,Array<string>>>({})
+    const [showPassword, setShowPassword] = useState(false)
+
+
+    const handleSubmit = async (e:any) =>{
+        e.preventDefault()
+        const loginRes = awaitLogin({email, password})
+        if(loginRes.error){
+            setErrors(loginRes.error)
+        }else{
+            setEmail("")
+            setPassword("")
+            redirect("/")
+        }
+    }
+
 	return (
 		<div className="w-full  bg-white relative">
 			{/* Background grid */}
@@ -18,19 +36,29 @@ export default function LoginClient() {
 					<div className="bg-white rounded-2xl shadow-md border border-gray-100 p-8">
 						<h1 className="text-3xl font-bold text-center text-gray-900 mb-6">Login</h1>
 
-						<form action="#" method="POST" className="space-y-6">
+						<form onSubmit={handleSubmit} className="space-y-6">
 							<div>
 								<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
 									Email
 								</label>
-								<input type="email" id="email" name="email" placeholder="example@gmail.com" className="custom-input" />
+								<input type="email" id="email" name="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="example@gmail.com" className="custom-input" />
+								{errors?.email && <p className="text-sm text-red-600 m-2">{errors?.email}</p>}
 							</div>
 
 							<div>
 								<label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
 									Password
 								</label>
-								<input type="password" id="password" name="password" placeholder="Password" className="custom-input" />
+								<div className="relative">
+								    <input type={showPassword ? "text": "password"} id="password" name="password" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="Password" className="custom-input" />
+								    <div className="absolute top-1/4 right-3 text-2xl cursor-pointer" onClick={()=>setShowPassword(!showPassword)}>
+                                        {showPassword?
+                                            <FaRegEyeSlash />
+                                            :
+                                             <FaRegEye />}
+								    </div>
+								</div>
+								{errors?.password && <p className="text-sm text-red-600 m-2">{errors?.password}</p>}
 							</div>
 
 							<div className="text-center text-sm">
