@@ -16,7 +16,7 @@ export default function LoginClient() {
 
     const handleSubmit = async (e:any) =>{
         e.preventDefault()
-        const loginRes = awaitLogin({email, password})
+        const loginRes = await Login({email, password})
         if(loginRes.error){
             setErrors(loginRes.error)
         }else{
