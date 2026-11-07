@@ -6,6 +6,7 @@ import { VscLoading } from "react-icons/vsc"
 import { Login, Register } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { SubmitEventHandler, useEffect, useState } from "react"
+import { toast } from "sonner"
 
 
 export default function LoginClient() {
@@ -22,10 +23,12 @@ export default function LoginClient() {
         const loginRes = await Login({email, password})
         if(loginRes.error){
             setErrors(loginRes.error)
+            toast.error(loginRes.error.detail || "Invalid Credentials", {richColors:true})
 
         }else{
             setEmail("")
             setPassword("")
+            toast.success("You have been logged in successfully!", {richColors:true})
             redirect("/")
 
         }

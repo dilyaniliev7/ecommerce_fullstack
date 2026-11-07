@@ -3,12 +3,14 @@ import Link from "next/link"
 import { Logout } from "@/lib/auth"
 import { useEffect, useState } from "react"
 import Loading from "../loading"
+import { toast } from "sonner"
 
 export default function LogoutClient() {
     const [loading, setLoading] = useState(true)
     useEffect (() => {
         Logout()
         setLoading(false)
+        toast.info("You have been logged out successfully", {richColors:true})
     }, [])
 
     if (loading) return <Loading />

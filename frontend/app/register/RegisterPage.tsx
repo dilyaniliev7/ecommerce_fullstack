@@ -4,6 +4,7 @@ import { useState } from "react"
 import { redirect } from "next/navigation"
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { VscLoading } from "react-icons/vsc"
+import { toast } from "sonner"
 
 export type RegisterFormDataType = {
     full_name: string,
@@ -58,11 +59,13 @@ export default function RegisterClient() {
         formData.set("password", registerFormData.password)
         if (registerFormData.avatar) formData.set("avatar", registerFormData.avatar.file)
 
-        const loginRes = await Register(formData)
-        if(loginRes.error){
-            setErrors(loginRes.error)
+        const registerRes = await Register(formData)
+        if(registerRes.error){
+            setErrors(registerRes.error)
+            toast.error(gisterRes.error.detail || "Account could not be created")
         }else{
             setRegisterFormData(DefaultRegisterFormDataType)
+            toast.success("Account has created successfully!", {richColors:true})
             redirect("/")
         }
         setLoading(false)
