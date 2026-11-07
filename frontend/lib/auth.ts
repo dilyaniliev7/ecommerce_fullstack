@@ -67,7 +67,11 @@ const notify: RefreshQueueCallbackType = (res)=>{
 }
 
 export const RefreshToken = async(): Promise<{ error: boolean}> =>{
+
     try {
+        const refresh_token = Cookie.get(REFRESH_TOKEN_COOKIE_NAME)
+        if (!refresh_token || refresh_token == "undefined") return {error:true}
+
         if (isRefreshing){
             const res = await new Promise<{ access:string, refresh:string, error:boolean}(resolve=>{
                     subscribe((res: {access:string, refresh:string, error:boolean }) => {
@@ -83,7 +87,7 @@ export const RefreshToken = async(): Promise<{ error: boolean}> =>{
             }
 
         } else{
-            const refresh_token = Cookie.get(REFRESH_TOKEN_COOKIE_NAME)
+
             isRefreshing = true
             const res = await publicApiInstance.post("authentication/token/refresh/", {
                 refresh:refresh_token

@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { VscLoading } from "react-icons/vsc"
 
 import { Login, Register } from "@/lib/auth"
 import { redirect } from "next/navigation"
@@ -8,6 +9,7 @@ import { SubmitEventHandler, useEffect, useState } from "react"
 
 
 export default function LoginClient() {
+    const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [errors, setErrors] = useState<Record<string,Array<string>>>({})
@@ -15,15 +17,19 @@ export default function LoginClient() {
 
 
     const handleSubmit = async (e:any) =>{
+        setLoading(true)
         e.preventDefault()
         const loginRes = await Login({email, password})
         if(loginRes.error){
             setErrors(loginRes.error)
+
         }else{
             setEmail("")
             setPassword("")
             redirect("/")
+
         }
+        setLoading(false)
     }
 
 	return (
@@ -70,8 +76,14 @@ export default function LoginClient() {
 								</p>
 							</div>
 
-							<button type="submit" className="custom-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2">
-								Login
+							<button inert={loading} type="submit" className="custom-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 gap-2">
+
+								{loading ?
+                                        <>
+                                            Logging in <VscLoading className="animate-spin"/>
+
+                                        </>
+                                    : "Login"}
 							</button>
 						</form>
 					</div>

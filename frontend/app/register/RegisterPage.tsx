@@ -3,6 +3,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { redirect } from "next/navigation"
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { VscLoading } from "react-icons/vsc"
 
 export type RegisterFormDataType = {
     full_name: string,
@@ -27,11 +28,13 @@ const DefaultRegisterFormDataType = {
 
 
 export default function RegisterClient() {
+    const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState<Record<string,Array<string>>>({})
     const [showPassword, setShowPassword] = useState(false)
     const [registerFormData, setRegisterFormData] = useState<RegisterFormDataType>(DefaultRegisterFormDataType)
 
     const handleOnChange = async (e:ChangeEvent<any>, isAvatar:boolean = false) => {
+            setLoading(true)
             if(isAvatar){
                 const file = e.target.files?.[0] || null
                 if(file){
@@ -43,8 +46,10 @@ export default function RegisterClient() {
             } else{
                 setRegisterFormData(prev:RegisterFormDataType => ({...prev, [e.target.name]: e.target.value}))
             }
+            setLoading(false)
     }
     const handleSubmit = async (e:any) =>{
+        setLoading(true)
         e.preventDefault()
         const formData = new FormData()
         formData.set("full_name", registerFormData.full_name)
@@ -60,6 +65,7 @@ export default function RegisterClient() {
             setRegisterFormData(DefaultRegisterFormDataType)
             redirect("/")
         }
+        setLoading(false)
     }
 
 	return (
@@ -145,8 +151,14 @@ export default function RegisterClient() {
 							</div>
 
 							{/* Submit button */}
-							<button type="submit" className="custom-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2">
-								Register
+							<button inert={loading} type="submit" className="custom-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 gap-2">
+
+								{loading ?
+                                        <>
+                                            Registering <VscLoading className="animate-spin"/>
+
+                                        </>
+                                    : "Register"}
 							</button>
 						</form>
 					</div>
