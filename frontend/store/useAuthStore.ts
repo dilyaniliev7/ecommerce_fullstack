@@ -8,6 +8,7 @@ export type UserDataType = {
 }
 
 type const authStoreType = {
+    loading:boolean
     user: UserDataType | null
     isAuthenticated: boolean
     login: (user: UserDataType) => void
@@ -16,7 +17,8 @@ type const authStoreType = {
 
 export const useAuthStore = create<authStoreType>((set)=>({
         user:null,
+        loadin:true,
         isAuthenticated:false,
-        login:()=>set({user:user, isAuthenticated:true}),
-        logout:()=> set({user:null, isAuthenticated:false})
+        login:()=>set({user:user, isAuthenticated:true, loading:false}),
+        logout:()=> set({user:null, isAuthenticated:false, loading:false})
 }))
