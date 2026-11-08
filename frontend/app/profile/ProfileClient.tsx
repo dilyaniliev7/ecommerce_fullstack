@@ -1,4 +1,31 @@
+"use client"
 import Sidebar from "@/components/Sidebar"
+import { ChangeEvent, useState } from "react"
+import { getFilePreview } from "@/lib/utils"
+import { toast } from "sonner"
+import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
+import { VscLoading } from "react-icons/vsc"
+
+export type ProfileFormDataType = {
+    full_name: string,
+    email: string
+    username:string
+    avatar:{
+        file:Blob,
+        preview:string
+    } | null
+    password:string
+    password2:string
+}
+
+const DefaultProfileFormData = {
+    full_name: "",
+    email: "",
+    username:"",
+    avatar:null,
+    password:"",
+    password2:""
+}
 
 export default function ProfileClient() {
 	// Static user data (placeholders)
@@ -9,6 +36,47 @@ export default function ProfileClient() {
 		avatar: "/default-avatar.jpg",
 	}
 
+
+    const [loading, setLoading] = useState(false)
+    const [errors, setErrors] = useState<Record<string,Array<string>>>({})
+    const [showPassword, setShowPassword] = useState(false)
+    const [registerFormData, setRegisterFormData] = useState<RegisterFormDataType>(DefaultRegisterFormDataType)
+
+    const handleOnChange = async (e:ChangeEvent<any>, isAvatar:boolean = false) => {
+            setLoading(true)
+            if(isAvatar){
+                const file = e.target.files?.[0] || null
+                if(file){
+                    const preview = await getFilePreview(file)
+                    setRegisterFormData(prev:RegisterFormDataType => ({...prev, avatar: {file:file, preview:preview}))
+                } else{
+                    setRegisterFormData(prev:RegisterFormDataType => ({...prev, avatar:null}))
+                }
+            } else{
+                setRegisterFormData(prev:RegisterFormDataType => ({...prev, [e.target.name]: e.target.value}))
+            }
+            setLoading(false)
+    }
+    const handleSubmit = async (e:any) =>{
+        setLoading(true)
+        e.preventDefault()
+        const formData = new FormData()
+        formData.set("full_name", registerFormData.full_name)
+        formData.set("username", registerFormData.username)
+        formData.set("password", registerFormData.password)
+        if (registerFormData.avatar) formData.set("avatar", registerFormData.avatar.file)
+
+        const res = await UpdateProfile(formData)
+        if(res.error){
+            setErrors(res.error)
+            toast.error(gisterRes.error.detail || "Account could not be updated")
+        }else{
+            setRegisterFormData(DefaultRegisterFormDataType)
+            toast.success("Account has been updated successfully!", {richColors:true})
+        }
+        setLoading(false)
+    }
+
 	return (
 		<div className="w-full min-h-screen bg-white">
 			<div className="max-w-7xl gap-2 sm:grid sm:grid-cols-[min(300px,50%)_1fr] p-4 w-full mx-auto">
@@ -16,50 +84,79 @@ export default function ProfileClient() {
 				<div className="max-w-7xl min-h-[40vh] w-full mx-auto p-10 flex flex-col items-center gap-4">
 					<h1 className="text-5xl font-bold">Profile</h1>
 
-					<form action="#" method="POST" className="flex flex-col justify-center items-center gap-6 my-4 w-full max-w-150">
-						{/* Avatar */}
-						<div className="flex flex-col w-full space-y-2 mb-3">
-							<label htmlFor="avatar" className="mx-auto flex justify-center items-center flex-col gap-3">
-								<img className="w-25 h-25 object-cover object-center rounded-full border-2 border-gray-200" src={mockUser.avatar} alt="Avatar" />
-								<span className="custom-btn cursor-pointer flex h-fit justify-center items-center gap-3 bg-sky-600 text-white">Upload</span>
-							</label>
-							<input type="file" id="avatar" name="avatar" accept="image/*" className="hidden" />
-						</div>
+					<form onSubmit={handleSubmit} className="space-y-5 w-full">
+							{/* Avatar Upload – static placeholder */}
+							<div className="flex flex-col items-center space-y-2">
+								<label htmlFor="avatar" className="cursor-pointer">
+									<img src={registerFormData.avatar?.preview || "/default-avatar.png"} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 hover:border-sky-600 transition-colors" />
+								</label>
+								<input type="file" id="avatar" name="avatar" accept="image/*" onChange={(e)=>handleOnChange(e,true)} className="hidden" />
+								<label htmlFor="avatar" className="custom-btn bg-sky-600 hover:bg-sky-700 text-white text-sm py-1 px-3 cursor-pointer">
+									Upload Avatar
+								</label>
 
-						{/* Full Name */}
-						<div className="flex flex-col w-full space-y-2">
-							<label htmlFor="full_name">Full Name</label>
-							<input className="custom-input" type="text" id="full_name" name="full_name" placeholder="John Doe" defaultValue={mockUser.full_name} />
-						</div>
+							</div>
 
-						{/* Email */}
-						<div className="flex flex-col w-full space-y-2">
-							<label htmlFor="email">Email</label>
-							<input className="custom-input" type="email" id="email" name="email" placeholder="example@gmail.com" defaultValue={mockUser.email} />
-						</div>
+							{/* Full Name */}
+							<div>
+								<label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-1">
+									Full Name
+								</label>
+								<input type="text" id="full_name" name="full_name" value={registerFormData.full_name} onChange={()=> 1 } readOnly placeholder="John Doe" className="custom-input" />
+								{errors?.full_name && <p className="text-sm text-red-600 m-2">{errors?.full_name}</p>}
+							</div>
 
-						{/* Username */}
-						<div className="flex flex-col w-full space-y-2">
-							<label htmlFor="username">Username</label>
-							<input className="custom-input" type="text" id="username" name="username" placeholder="Username" defaultValue={mockUser.username} />
-						</div>
+							{/* Email */}
+							<div>
+								<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+									Email
+								</label>
+								<input type="email" id="email" name="email" value={registerFormData.email} onChange={handleOnChange} placeholder="example@gmail.com" className="custom-input" />
+								{errors?.email && <p className="text-sm text-red-600 m-2">{errors?.email}</p>}
+							</div>
 
-						{/* New Password */}
-						<div className="flex flex-col w-full space-y-2">
-							<label htmlFor="password">New Password</label>
-							<input className="custom-input" type="password" id="password" name="password" placeholder="New Password" />
-						</div>
+							{/* Username */}
+							<div>
+								<label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+									Username
+								</label>
+								<input type="text" id="username" name="username" value={registerFormData.username} onChange={handleOnChange} placeholder="Username" className="custom-input" />
+								{errors?.username && <p className="text-sm text-red-600 m-2">{errors?.username}</p>}
+							</div>
 
-						{/* Confirm New Password */}
-						<div className="flex flex-col w-full space-y-2">
-							<label htmlFor="password2">Confirm New Password</label>
-							<input className="custom-input" type="password" id="password2" name="password2" placeholder="Confirm New Password" />
-						</div>
+							{/* Password */}
+							<div className="relative">
+								    <input type={showPassword ? "text": "password"} id="password" name="password" value={registerFormData.password} onChange={handleOnChange} placeholder="Password" className="custom-input" />
+								    <div className="absolute top-1/4 right-3 text-2xl cursor-pointer" onClick={()=>setShowPassword(!showPassword)}>
+                                        {showPassword?
+                                            <FaRegEyeSlash />
+                                            :
+                                             <FaRegEye />}
+								    </div>
+								</div>
+								{errors?.password && <p className="text-sm text-red-600 m-2">{errors?.password}</p>}
+							</div>
 
-						<button type="submit" className="w-[10ch] h-[5ch] mt-2 custom-btn bg-sky-500 hover:bg-sky-600 text-white font-bold tracking-wider text-nowrap whitespace-nowrap flex justify-center items-center">
-							Save
-						</button>
-					</form>
+							{/* Confirm Password */}
+							<div>
+								<label htmlFor="password2" className="block text-sm font-medium text-gray-700 mb-1">
+									Confirm Password
+								</label>
+								<input type={showPassword ? "text": "password"} id="password2" name="password2" value={registerFormData.password2} onChange={handleOnChange} placeholder="Confirm Password" className="custom-input" />
+								{errors?.password2 && <p className="text-sm text-red-600 m-2">{errors?.password2}</p>}
+							</div>
+
+							{/* Submit button */}
+							<button inert={loading} type="submit" className="custom-btn w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 gap-2">
+
+								{loading ?
+                                        <>
+                                            Updating <VscLoading className="animate-spin"/>
+
+                                        </>
+                                    : "Update"}
+							</button>
+						</form>
 				</div>
 			</div>
 		</div>

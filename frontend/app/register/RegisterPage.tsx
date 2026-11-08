@@ -1,10 +1,12 @@
 "use client"
 import Link from "next/link"
-import { useState } from "react"
 import { redirect } from "next/navigation"
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { VscLoading } from "react-icons/vsc"
 import { toast } from "sonner"
+import { ChangeEvent, useState } from "react"
+import { getFilePreview } from "@/lib/utils"
+import { Register } from "@/lib/auth"
 
 export type RegisterFormDataType = {
     full_name: string,

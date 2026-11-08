@@ -45,7 +45,15 @@ export const Register = async (data: FormData) : Promise<{error:any | null}>=> {
     }
 
 }
+export const UpdateProfile = async (data: FormData) : Promise<{error:any | null}>=> {
+    try {
+        await privateApiInstance.patch("authentication/profile/", data)
+        return {error:null}
+    } catch (error:any){
+        return {error: error.response?.data || {}
+    }
 
+}
 export const Logout = () => {
     Cookie.remove(ACCESS_TOKEN_COOKIE_NAME)
     Cookie.remove(REFRESH_TOKEN_COOKIE_NAME)
@@ -66,7 +74,7 @@ const notify: RefreshQueueCallbackType = (res)=>{
     refreshQueue = []
 }
 
-export const RefreshToken = async(): Promise<{ error: boolean}> =>{
+export const RefreshToken = async(): Promise<{ error: boolean, access?:string}> =>{
 
     try {
         const refresh_token = Cookie.get(REFRESH_TOKEN_COOKIE_NAME)
@@ -83,7 +91,7 @@ export const RefreshToken = async(): Promise<{ error: boolean}> =>{
                 return {error:true}
             } else{
                 SaveAuthTokens({access:res.access, refresh:res.refresh})
-                return {error:false}
+                return {error:false, access:res.access}
             }
 
         } else{
@@ -95,7 +103,7 @@ export const RefreshToken = async(): Promise<{ error: boolean}> =>{
             SaveAuthTokens({access:res.data.access, refresh:res.data.refresh})
             notify(res.data)
             isRefreshing = false
-            return {error:false}
+            return {error:false, access:res.data.access}
         }
 
     } catch(error){
