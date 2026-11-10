@@ -29,6 +29,18 @@ export const Login = async (data:{email:string, password:string}) : Promise<{err
     }
 
 }
+export const RefreshUserData = async () => {
+    try {
+        const res = await privateApiInstance.post("authentication/token/force-refresh")
+        const {access, refresh} = res.data
+        SaveAuthTokens({access, refresh})
+
+        return {error:null}
+    } catch (error:any){
+        return {error: error.response?.data || {}
+    }
+
+}
 
 export const Register = async (data: FormData) : Promise<{error:any | null}>=> {
     try {

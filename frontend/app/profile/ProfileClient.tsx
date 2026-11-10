@@ -28,19 +28,22 @@ const DefaultProfileFormData = {
 }
 
 export default function ProfileClient() {
-	// Static user data (placeholders)
-	const mockUser = {
-		full_name: "John Doe",
-		email: "john.doe@example.com",
-		username: "johndoe",
-		avatar: "/default-avatar.jpg",
-	}
-
-
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState<Record<string,Array<string>>>({})
     const [showPassword, setShowPassword] = useState(false)
-    const [registerFormData, setRegisterFormData] = useState<RegisterFormDataType>(DefaultRegisterFormDataType)
+    const [profileFormData, setProfileFormData] = useState<RegisterFormDataType>(DefaultRegisterFormDataType)
+    const fetchProfileDataToProfileFormData = async () => {
+        try {
+            const res = await privateApiInstance.get("authentication/profile/")
+            setProfileFormData({...DefaultProfileFormData, ...res.data, avatar:null })
+        }  catch (error) {
+            setProfileFormData(DefaultRegisterFormData)
+        }
+    }
+
+    useEffect(() => {
+        fetchProfileDataToProfileFormData()
+    }, [])
 
     const handleOnChange = async (e:ChangeEvent<any>, isAvatar:boolean = false) => {
             setLoading(true)
@@ -71,8 +74,10 @@ export default function ProfileClient() {
             setErrors(res.error)
             toast.error(gisterRes.error.detail || "Account could not be updated")
         }else{
-            setRegisterFormData(DefaultRegisterFormDataType)
+            setErrors({})
             toast.success("Account has been updated successfully!", {richColors:true})
+            RefreshUserData()
+            fetchProfileDataToProfileFormData()
         }
         setLoading(false)
     }
@@ -100,7 +105,7 @@ export default function ProfileClient() {
 							{/* Full Name */}
 							<div>
 								<label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-1">
-									Full Name
+									Full Name *
 								</label>
 								<input type="text" id="full_name" name="full_name" value={registerFormData.full_name} onChange={()=> 1 } readOnly placeholder="John Doe" className="custom-input" />
 								{errors?.full_name && <p className="text-sm text-red-600 m-2">{errors?.full_name}</p>}
@@ -118,29 +123,32 @@ export default function ProfileClient() {
 							{/* Username */}
 							<div>
 								<label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-									Username
+									Username *
 								</label>
 								<input type="text" id="username" name="username" value={registerFormData.username} onChange={handleOnChange} placeholder="Username" className="custom-input" />
 								{errors?.username && <p className="text-sm text-red-600 m-2">{errors?.username}</p>}
 							</div>
+                            <div>
+                                <label htmlFor="password2" className="block text-sm font-medium text-gray-700 mb-1">
+                                        New Password
+                                </label>
+                                <div className="relative">
 
-							{/* Password */}
-							<div className="relative">
-								    <input type={showPassword ? "text": "password"} id="password" name="password" value={registerFormData.password} onChange={handleOnChange} placeholder="Password" className="custom-input" />
-								    <div className="absolute top-1/4 right-3 text-2xl cursor-pointer" onClick={()=>setShowPassword(!showPassword)}>
-                                        {showPassword?
-                                            <FaRegEyeSlash />
-                                            :
-                                             <FaRegEye />}
-								    </div>
-								</div>
-								{errors?.password && <p className="text-sm text-red-600 m-2">{errors?.password}</p>}
-							</div>
+                                        <input type={showPassword ? "text": "password"} id="password" name="password" value={registerFormData.password} onChange={handleOnChange} placeholder="Password" className="custom-input" />
+                                        <div className="absolute top-1/4 right-3 text-2xl cursor-pointer" onClick={()=>setShowPassword(!showPassword)}>
+                                            {showPassword?
+                                                <FaRegEyeSlash />
+                                                :
+                                                 <FaRegEye />}
+                                        </div>
+                                    </div>
+                                    {errors?.password && <p className="text-sm text-red-600 m-2">{errors?.password}</p>}
+                                </div>
 
 							{/* Confirm Password */}
 							<div>
 								<label htmlFor="password2" className="block text-sm font-medium text-gray-700 mb-1">
-									Confirm Password
+									Confirm New Password
 								</label>
 								<input type={showPassword ? "text": "password"} id="password2" name="password2" value={registerFormData.password2} onChange={handleOnChange} placeholder="Confirm Password" className="custom-input" />
 								{errors?.password2 && <p className="text-sm text-red-600 m-2">{errors?.password2}</p>}
