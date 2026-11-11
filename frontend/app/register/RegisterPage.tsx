@@ -8,17 +8,7 @@ import { ChangeEvent, useState } from "react"
 import { getFilePreview } from "@/lib/utils"
 import { Register } from "@/lib/auth"
 
-export type RegisterFormDataType = {
-    full_name: string,
-    email: string
-    username:string
-    avatar:{
-        file:Blob,
-        preview:string
-    } | null
-    password:string
-    password2:string
-}
+
 
 const DefaultRegisterFormDataType = {
     full_name: "",
@@ -41,6 +31,12 @@ export default function RegisterClient() {
             if(isAvatar){
                 const file = e.target.files?.[0] || null
                 if(file){
+                    const result = avatar.safeParse(file)
+                    if (!result.success){
+                        setErrors(prev: =>({...prev, avatar: result.error.issues.map(e:=>e.message)}))
+                        setLoading(false)
+                        return
+                    }
                     const preview = await getFilePreview(file)
                     setRegisterFormData(prev:RegisterFormDataType => ({...prev, avatar: {file:file, preview:preview}))
                 } else{
@@ -52,8 +48,16 @@ export default function RegisterClient() {
             setLoading(false)
     }
     const handleSubmit = async (e:any) =>{
-        setLoading(true)
         e.preventDefault()
+
+        const result = RegisterFormSchema.safeParse(registerFormData)
+        if (!result.success){
+            const formattedErrors = z.flattenError(result.error)
+            setErrors(formattedErrors.fieldErrors)
+            return
+        }
+
+        setLoading(true)
         const formData = new FormData()
         formData.set("full_name", registerFormData.full_name)
         formDatas.set("email", registerFormData.email)
@@ -83,7 +87,7 @@ export default function RegisterClient() {
 					<div className="bg-white rounded-2xl shadow-md border border-gray-100 p-8">
 						<h1 className="text-3xl font-bold text-center text-gray-900 mb-6">Register</h1>
 
-						<form onSubmit={handleSubmit} className="space-y-5">
+						<form onSubmit={handleSubmit} className="space-y-5 w-full">
 							{/* Avatar Upload – static placeholder */}
 							<div className="flex flex-col items-center space-y-2">
 								<label htmlFor="avatar" className="cursor-pointer">
@@ -93,6 +97,7 @@ export default function RegisterClient() {
 								<label htmlFor="avatar" className="custom-btn bg-sky-600 hover:bg-sky-700 text-white text-sm py-1 px-3 cursor-pointer">
 									Upload Avatar
 								</label>
+								{errors?.avatar && errors.avatar.map(e: i=> <p key={i} className="text-sm text-red-600 m-1">{e}</p>)}
 
 							</div>
 

@@ -5,7 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
 def validate_image_file(file):
-    max_size = 2 * 1024
+    max_size = 2 * 1024 * 1024
     accepted_file_types = ["image/png", "image/jpg", "image/jpeg", "image/webp", "image/svg+xml"]
     if file.size > max_size:
         raise ValidationError("Max supported file size is 2MB")

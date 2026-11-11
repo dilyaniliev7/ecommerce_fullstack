@@ -6,17 +6,7 @@ import { toast } from "sonner"
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { VscLoading } from "react-icons/vsc"
 
-export type ProfileFormDataType = {
-    full_name: string,
-    email: string
-    username:string
-    avatar:{
-        file:Blob,
-        preview:string
-    } | null
-    password:string
-    password2:string
-}
+
 
 const DefaultProfileFormData = {
     full_name: "",
@@ -31,7 +21,7 @@ export default function ProfileClient() {
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState<Record<string,Array<string>>>({})
     const [showPassword, setShowPassword] = useState(false)
-    const [profileFormData, setProfileFormData] = useState<RegisterFormDataType>(DefaultRegisterFormDataType)
+    const [profileFormData, setProfileFormData] = useState<ProfileFormDataType>(DefaultRegisterFormDataType)
     const fetchProfileDataToProfileFormData = async () => {
         try {
             const res = await privateApiInstance.get("authentication/profile/")
@@ -50,6 +40,12 @@ export default function ProfileClient() {
             if(isAvatar){
                 const file = e.target.files?.[0] || null
                 if(file){
+                    const result = avatar.safeParse(file)
+                    if (!result.success){
+                        setErrors(prev: =>({...prev, avatar: result.error.issues.map(e:=>e.message)}))
+                        setLoading(false)
+                        return
+                    }
                     const preview = await getFilePreview(file)
                     setRegisterFormData(prev:RegisterFormDataType => ({...prev, avatar: {file:file, preview:preview}))
                 } else{
@@ -61,8 +57,14 @@ export default function ProfileClient() {
             setLoading(false)
     }
     const handleSubmit = async (e:any) =>{
-        setLoading(true)
         e.preventDefault()
+        const result = ProfileFormSchema.safeParse(profileFormData)
+        if (!result.success){
+            const formattedErrors = z.flattenError(result.error)
+            setErrors(formattedErrors.fieldErrors)
+            return
+        }
+        setLoading(true)
         const formData = new FormData()
         formData.set("full_name", registerFormData.full_name)
         formData.set("username", registerFormData.username)
@@ -99,6 +101,7 @@ export default function ProfileClient() {
 								<label htmlFor="avatar" className="custom-btn bg-sky-600 hover:bg-sky-700 text-white text-sm py-1 px-3 cursor-pointer">
 									Upload Avatar
 								</label>
+								{errors?.avatar && errors.avatar.map(e: i=> <p key={i} className="text-sm text-red-600 m-1">{e}</p>)}
 
 							</div>
 
@@ -117,7 +120,7 @@ export default function ProfileClient() {
 									Email
 								</label>
 								<input type="email" id="email" name="email" value={registerFormData.email} onChange={handleOnChange} placeholder="example@gmail.com" className="custom-input" />
-								{errors?.email && <p className="text-sm text-red-600 m-2">{errors?.email}</p>}
+								{errors?.full_name && <p className="text-sm text-red-600 m-2">{errors?.email}</p>}
 							</div>
 
 							{/* Username */}

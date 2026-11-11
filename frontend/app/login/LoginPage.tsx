@@ -18,8 +18,15 @@ export default function LoginClient() {
 
 
     const handleSubmit = async (e:any) =>{
-        setLoading(true)
         e.preventDefault()
+        const result = LoadingFormSchema.safeParse({email, password})
+        if(!result.success){
+            const formattedErrors = z.flattenError(result.error)
+            setErrors(formattedErrors.fieldErrors)
+            return
+        }
+        setLoading(true)
+
         const loginRes = await Login({email, password})
         if(loginRes.error){
             setErrors(loginRes.error)
@@ -50,7 +57,7 @@ export default function LoginClient() {
 								<label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
 									Email
 								</label>
-								<input type="email" id="email" name="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="example@gmail.com" className="custom-input" />
+								<input type="text" id="email" name="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="example@gmail.com" className="custom-input" />
 								{errors?.email && <p className="text-sm text-red-600 m-2">{errors?.email}</p>}
 							</div>
 
