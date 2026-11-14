@@ -57,8 +57,6 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
 
-        if not self.avatar:
-            self.avatar = "/default-avatar.png"
         return super().save(*args, **kwargs)
 
 
@@ -98,7 +96,6 @@ class Variant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name = models.CharField(max_length=256)
     price = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal("0.00"))
-    image = models.FileField(upload_to="products/colors/", blank=True, null=True)
 
 
     def __str__(self):
