@@ -5,7 +5,7 @@ import { TbHeartMinus } from "react-icons/tb";
 export default function ProductCard(){
     return (
 							<div  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-								<Link href="/product/slug" className="block relative aspect-square overflow-hidden">
+								<Link href={`/products/${products.slug}`} className="block relative aspect-square overflow-hidden">
 									<img src="/placeholder.jpg" alt="Product" className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
 								</Link>
 								<div className="p-4">

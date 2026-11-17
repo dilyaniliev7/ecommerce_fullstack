@@ -75,7 +75,11 @@ export default function HomeClient() {
 					<h2 id="products" className="text-3xl font-bold text-center mb-12">
 						Featured Products
 					</h2>
-
+					    {!products || products.length < 1 && <p className="text-center text-gray-500">No Products</p>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {products?.map((product) => (
+                            <ProductCard product={product} key={i} />
+                        ))}
 
 
 					<div className="flex justify-center mt-12">
