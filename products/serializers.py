@@ -33,9 +33,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer(read_only=True)
     gallery = GallerySerializer(read_only=True, many=True)
-    specification = SpecificationSerializer(read_only=True, many=True)
-    color = ColorSerializer(read_only=True, many=True)
-    variant = VariantSerializer(read_only=True, many=True)
+    specifications = SpecificationSerializer(read_only=True, many=True)
+    colors = ColorSerializer(read_only=True, many=True)
+    variants = VariantSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product

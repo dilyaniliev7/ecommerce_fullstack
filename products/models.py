@@ -61,7 +61,7 @@ class Product(models.Model):
 
 
 class Gallery(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="gallery")
     image = models.FileField(upload_to="products/gallery/", blank=True, null=True)
 
     def __str__(self):
@@ -72,7 +72,7 @@ class Gallery(models.Model):
 
 
 class Specification(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="specifications")
     title = models.CharField(max_length=256)
     content = models.CharField(max_length=512)
 
@@ -81,7 +81,7 @@ class Specification(models.Model):
 
 
 class Color(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="colors")
     title = models.CharField(max_length=256)
     image = models.FileField(upload_to="products/colors/", blank=True, null=True)
     color_code = models.CharField(max_length=512)
@@ -93,7 +93,7 @@ class Color(models.Model):
 
 
 class Variant(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variants")
     name = models.CharField(max_length=256)
     price = models.DecimalField(max_digits=16, decimal_places=2, default=Decimal("0.00"))
 
