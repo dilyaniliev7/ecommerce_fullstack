@@ -9,8 +9,12 @@ import { useRef } from "react"
 
 export default function ProductDetailPage({ product }: { product: Record<string, any> | null }) {
 
-
+    const [color, setColor] = useState<Record<string, string>>(product?.colors?.[0] || null)
+    const [variant, setVariant] = useState<Record<string, string>>(product?.variants?.[0] || null)
+    const [quantity, setQuantity] = useState(1)
     const thumbnailRef = useRef<HTMLImageElement>(null)
+
+
 
 	// Static reviews
 	const reviews = [
@@ -45,6 +49,7 @@ export default function ProductDetailPage({ product }: { product: Record<string,
 							))}
 						</div>
 					</div>
+			    </div>
 
 					{/* Product info */}
 					<div className="lg:w-1/2 lg:pl-10 lg:py-6 lg:mt-0 w-full mt-6">
@@ -84,11 +89,11 @@ export default function ProductDetailPage({ product }: { product: Record<string,
 						{product.colors.length > 0 && (
 							<div className="mt-6">
 								<p className="mb-3">
-									Colors <b>({product.colors[0].name}):</b>
+									Colors <b>({color?.name}):</b>
 								</p>
 								<div className="flex mr-6 mb-4 gap-0.5 items-center">
-									{product.colors.map((color: Record<string,string>m i:number) => (
-										<button key={i} className="focus:outline-none w-6 h-6 ease-in-out border-2 border-gray-300 rounded-full" style={{ background: color.color_code }}></button>
+									{product.colors.map((c: Record<string,string>m i:number) => (
+										<button onClick={()=> setColor(c)} key={i} className={`focus:outline-none w-6 h-6 ease-in-out border-2 ${color === c ? "border-blue-600" : "border-gray-300"} rounded-full`}style={{ background: c.color_code }}></button>
 									))}
 								</div>
 							</div>
@@ -98,25 +103,41 @@ export default function ProductDetailPage({ product }: { product: Record<string,
 						{product.variants.length > 0 && (
 							<div>
 								<div className="flex gap-2 mr-6">
-									{product.variants.map((variant: Record<string,string>m i:number) => (
-										<button key={i} className="bg-neutral-600 hover:bg-neutral-600 custom-btn text-white">
-											{variant.name}
+									{product.variants.map((v: Record<string,string>m i:number) => (
+										<button onClick={() => setVariant(v)} key={i} className={`${variant===v? "bg-neutral-600 hover:bg-blue-600" : "bg-blue-600 hover:bg-neutral-600"} custom-btn text-white`}>
+											{v.name}
 										</button>
 									))}
 								</div>
 								<p className="mt-2">
-									Selected: <b>{product.variants[0].name}</b>
+									Selected: <b>{variant.name}</b>
 								</p>
 							</div>
 						)}
 
 						{/* Quantity selector */}
 						<div className="flex items-center justify-center w-40 gap-2 mt-3">
-							<button type="button">
+							<button onClick={()=> {
+                                setQuantity(prev => {
+
+                                if (prev-1 < 1) return 1
+                                else if (prev -1 > Number(product.stock_quantity)) return product.stock_quantity else return prev-1
+                                })
+                            }} type="button">
 								<BiMinus />
 							</button>
-							<input type="number" className="hide-arrows w-10 text-center text-black" defaultValue="1" min="1" max={product.stock_quantity} />
-							<button type="button">
+							<input type="number" className="hide-arrows w-10 text-center text-black" value={quantity} onChange={(e)=> {
+                                const value = Number(e.target.value)
+                                if (value < 1) setQuantity(1)
+                                else if (value > Number(product.stock_quantity)) setQuantity(product.stock_quantity) else setQuantity(value)
+                            }} />
+							<button onClick={()=> {
+                                setQuantity(prev => {
+
+                                if (prev+1 < 1) return 1
+                                else if (prev +1 > Number(product.stock_quantity)) return product.stock_quantity else return prev+1
+                                })
+                            }} type="button">
 								<BiPlus />
 							</button>
 						</div>
