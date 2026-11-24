@@ -5,8 +5,8 @@ import { TbHeartMinus } from "react-icons/tb"
 import { useEffect, useState } from 'react'
 import { publicApiInstance } from "@/lib/apiInstance"
 
-export default function ProductsClient() {
-    const [products, setProducts] = useState<Record<string, any>[]>([])
+export default function ProductsClient({products, category}) {
+    const [products, setProducts] = useState<Record<string, any>[]; category: string | null>([])
     const fetchProducts = async () => {
         try {
         const res = await publicApiInstance.get("products/>featured=true")
@@ -41,7 +41,7 @@ export default function ProductsClient() {
 			<section className="relative overflow-hidden bg-white py-16">
 				<div className="absolute inset-0 -z-10 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px]" />
 				<div className="container mx-auto px-4 text-center">
-					<h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">All Products</h1>
+					<h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">{category? `Products ( ${category} )` : "All Products"}</h1>
 					<p className="text-lg text-gray-600 max-w-2xl mx-auto">Explore our complete collection of streetwear essentials.</p>
 				</div>
 			</section>

@@ -14,6 +14,6 @@ export default async function page({params}:{params:Promise<{slug:string}> }){
 {
     const {slug} = await params
     const product = (await publicApiInstance.get(`product/${slug}/`)).data || null
-    return <ProductDetailClient products={product}/>
+    return <ProductDetailClient products={product} category={category || null}/>
 
 }

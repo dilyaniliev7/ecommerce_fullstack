@@ -171,7 +171,7 @@ export default function ProductDetailPage({ product }: { product: Record<string,
 					<div className="flex flex-col w-full space-y-2">
 						<label htmlFor="Rating">Rating</label>
 						<div className="text-sky-600 flex gap-2 text-xl">
-							{[...Array(5)].map((_, i) => (i < 4 ? <BsStarFill key={i} className="cursor-pointer" /> : <BsStar key={i} className="cursor-pointer" />))}
+							{[...Array(5)].map((_, i) => (i < 4 ? <BsFStarFill key={i} className="cursor-pointer" /> : <BsStar key={i} className="cursor-pointer" />))}
 							<span className="ml-3 text-base">4/5</span>
 						</div>
 					</div>
