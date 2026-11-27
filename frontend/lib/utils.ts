@@ -1,4 +1,4 @@
-
+import { BACKEND_URL } from "./constants"
 
 export const getFilePreview = async (file:Blob):Promise<string>=>{
     return new Promise<string>(resolve => {
