@@ -1,6 +1,8 @@
-from rest_framework import generics
-from .models import Product, Category, product_status_choice
-from .serializers import ProductSerializer, CategorySerializer
+from django.shortcuts import get_object_or_404
+from rest_framework import generics, serializers
+from rest_framework.permissions import IsAuthenticated
+from .models import Product, Category, product_status_choice, Wishlist
+from .serializers import ProductSerializer, CategorySerializer, WishlistSerializer
 
 class CategoryListAPIView(generics.ListAPIView):
     serializer_class = CategorySerializer
@@ -29,3 +31,30 @@ class ProductRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = ProductSerializer
     lookup_field = "slug"
     queryset = Product.objects.filter(status=product_status_choice.published)
+
+
+class WishListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.request.user.wishlist.all()
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        product = serializer.validated_data["product"]
+
+        if Wishlist.objects.filter(user=user, product=product).exists():
+            raise serializers.ValidationError({"detail":"Item is already on wishlist."})
+        serializer.save(user=user)
+
+
+class RemoveFromWishlistAPIView(generics.DestroyAPIView):
+    serializer_class = WishlistSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        user = self.request.user
+        product_id = self.kwargs.get("product_id")
+        wishlist_item = get_object_or_404(Wishlist, user=user, product__id=product_id)
+        return wishlist_item

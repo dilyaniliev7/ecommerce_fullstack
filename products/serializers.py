@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from .models import Product, Category, Gallery, Specification, Color, Variant
+from .models import Product, Category, Gallery, Specification, Color, Variant, Wishlist
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
+
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -40,3 +41,12 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = "__all__"
+
+
+class WishlistSerializer(serializers.ModelSerializer):
+    product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), source="product", write_only=True)
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = Wishlist
+        fields = ["id", "product", "product_id"]

@@ -101,3 +101,12 @@ class Variant(models.Model):
     def __str__(self):
         return
         self.name
+
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=CASCADE, related_name="wishlist")
+    product = models.ForeignKey(User, on_delete=CASCADE, related_name="product")
+
+    class Meta:
+        unique_together = ("user", "product")
